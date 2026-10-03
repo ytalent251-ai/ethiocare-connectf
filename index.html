@@ -99,7 +99,7 @@
   }());
 </script>
 <script>
-  /* Real form delivery: this capture-phase handler replaces the legacy mailto flow above. */
+  /* Form delivery: this capture-phase handler replaces the legacy mailto flow above. */
   (function () {
     const SUCCESS = 'Thank you! Your information has been submitted successfully. We’ll get back to you soon.';
     const FAILURE = 'We couldn’t submit your information right now. Please try again or contact us directly by email or WhatsApp.';
@@ -147,7 +147,13 @@
           const data = new FormData(form);
           data.set('formType', formType);
           data.append('website', '');
-          const response = await fetch('/.netlify/functions/submit', { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+          const response = formType === 'contact'
+            ? await fetch('https://formsubmit.co/ajax/ethiocareconnect@gmail.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                body: JSON.stringify({ ...Object.fromEntries(data.entries()), _subject: 'New EthioCare Connect Contact Inquiry', _template: 'table', _replyto: data.get('email') })
+              })
+            : await fetch('/.netlify/functions/submit', { method: 'POST', body: data, headers: { Accept: 'application/json' } });
           const result = await response.json().catch(() => ({}));
           if (!response.ok || result.ok !== true) throw new Error('Submission failed');
           form.reset();
