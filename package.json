@@ -1,0 +1,9 @@
+{
+  "name": "ethiocare-connect",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "resend": "^4.0.1"
+  }
+}
