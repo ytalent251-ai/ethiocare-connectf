@@ -155,7 +155,7 @@
               })
             : await fetch('/.netlify/functions/submit', { method: 'POST', body: data, headers: { Accept: 'application/json' } });
           const result = await response.json().catch(() => ({}));
-          if (!response.ok || result.ok !== true) throw new Error('Submission failed');
+          if (!response.ok || (formType !== 'contact' && result.ok !== true)) throw new Error('Submission failed');
           form.reset();
           showStatus(form, SUCCESS);
         } catch (_) {
