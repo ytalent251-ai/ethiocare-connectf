@@ -144,17 +144,12 @@
         button.textContent = 'Submitting…';
         try {
           const data = new FormData(form);
-          data.set('formType', formType);
-          data.append('website', '');
-          const response = formType === 'contact'
-            ? await fetch('https://formsubmit.co/ajax/ethiocareconnect@gmail.com', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                body: JSON.stringify({ ...Object.fromEntries(data.entries()), _subject: 'New EthioCare Connect Contact Inquiry', _template: 'table', _replyto: data.get('email') })
-              })
-            : await fetch('/.netlify/functions/submit', { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-          const result = await response.json().catch(() => ({}));
-          if (!response.ok || (formType !== 'contact' && result.ok !== true)) throw new Error('Submission failed');
+          const isOrganization = formType === 'organization';
+          data.set('_subject', isOrganization ? 'New Healthcare Organization Inquiry - EthioCare Connect' : formType === 'interpreter' ? 'New Medical Interpreter Registration - EthioCare Connect' : 'New EthioCare Connect Contact Inquiry');
+          data.set('_template', 'table');
+          data.set('_replyto', data.get(isOrganization ? 'Work Email' : 'Email') || data.get('email') || '');
+          const response = await fetch('https://formsubmit.co/ajax/ethiocareconnect@gmail.com', { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+          if (!response.ok) throw new Error('Submission failed');
           form.reset();
           showStatus(form, SUCCESS);
         } catch (_) {
